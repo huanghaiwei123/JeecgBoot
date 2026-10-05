@@ -192,8 +192,15 @@ public final class DictSqlConditionCheckUtil {
 		}
 		if (isComparisonExpression(expression)) {
 			BinaryExpression comparison = (BinaryExpression) expression;
-			return addConditionField(comparison.getLeftExpression(), conditionFields)
-					&& isLiteral(comparison.getRightExpression());
+           	//update-begin---author:huanghaiwei123 ---date:2026-10-05 for：【issues/9883】允许 1=1 这类常量恒真条件，修复字典排序失效
+			Expression leftExpression = comparison.getLeftExpression();
+			Expression rightExpression = comparison.getRightExpression();
+			//update-end---author:huanghaiwei123 ---date:2026-10-05 for：【issues/9883】
+			if (isLiteral(leftExpression) && isLiteral(rightExpression)) {
+				return true;
+			}
+			return addConditionField(leftExpression, conditionFields)
+					&& isLiteral(rightExpression);
 		}
 		if (expression instanceof LikeExpression likeExpression) {
 			return addConditionField(likeExpression.getLeftExpression(), conditionFields)
